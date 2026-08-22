@@ -1,0 +1,23 @@
+.DS_Store
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# YOLO / training outputs
+runs/
+yolo11n.pt
+*.pt
+*.onnx
+
+# Large datasets
+train/
+test/
+yolo_dataset/
+yolo_dataset_corrected/
+yolo_train/
+
+# Temporary files
+/tmp/
+*.log

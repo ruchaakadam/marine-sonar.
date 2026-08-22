@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marine Sonar Detection</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7f9;
+            color: #17212b;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #667;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        input {
+            margin: 15px 0;
+        }
+
+        button {
+            display: block;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #146c94;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0f5878;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .image-container {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+            margin-top: 20px;
+        }
+
+        #preview {
+            display: none;
+            max-width: 100%;
+            max-height: 600px;
+            border-radius: 8px;
+        }
+
+        #overlay {
+            position: absolute;
+            left: 0;
+            top: 0;
+            pointer-events: none;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #eef3f6;
+            border-radius: 8px;
+        }
+
+        .detection {
+            padding: 10px;
+            margin-top: 8px;
+            background: white;
+            border-radius: 6px;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Marine Sonar Detection</h1>
+
+    <p class="subtitle">
+        Upload a sonar image to detect potential crab pots.
+    </p>
+
+    <div class="card">
+
+        <input id="imageInput" type="file" accept="image/*">
+
+        <button id="detectButton" disabled>
+            Detect Crab Pots
+        </button>
+
+        <div class="image-container">
+            <img id="preview" alt="Sonar preview">
+            <canvas id="overlay"></canvas>
+        </div>
+
+        <div id="result">
+            Select an image to begin.
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+const imageInput = document.getElementById("imageInput");
+const detectButton = document.getElementById("detectButton");
+const preview = document.getElementById("preview");
+const overlay = document.getElementById("overlay");
+const result = document.getElementById("result");
+
+let selectedFile = null;
+
+imageInput.addEventListener("change", () => {
+
+    selectedFile = imageInput.files[0];
+
+    if (!selectedFile) {
+        detectButton.disabled = true;
+        preview.style.display = "none";
+        return;
+    }
+
+    preview.src = URL.createObjectURL(selectedFile);
+
+    preview.onload = () => {
+        overlay.width = preview.clientWidth;
+        overlay.height = preview.clientHeight;
+        clearBoxes();
+    };
+
+    preview.style.display = "block";
+
+    detectButton.disabled = false;
+
+    result.innerHTML = `
+        <span class="status">Ready.</span>
+        Image selected: ${selectedFile.name}
+    `;
+});
+
+
+function clearBoxes() {
+    const ctx = overlay.getContext("2d");
+    ctx.clearRect(0, 0, overlay.width, overlay.height);
+}
+
+
+function drawDetections(detections) {
+
+    clearBoxes();
+
+    const ctx = overlay.getContext("2d");
+
+    const scaleX = preview.clientWidth / preview.naturalWidth;
+    const scaleY = preview.clientHeight / preview.naturalHeight;
+
+    detections.forEach((detection) => {
+
+        const box = detection.bbox;
+
+        const x = box.x * scaleX;
+        const y = box.y * scaleY;
+        const width = box.width * scaleX;
+        const height = box.height * scaleY;
+
+        ctx.strokeStyle = "#ff0000";
+        ctx.lineWidth = 3;
+
+        ctx.strokeRect(
+            x,
+            y,
+            width,
+            height
+        );
+
+        ctx.fillStyle = "#ff0000";
+        ctx.font = "16px Arial";
+
+        const confidence =
+            Math.round(detection.confidence * 100);
+
+        ctx.fillText(
+            `${detection.class} ${confidence}%`,
+            x,
+            Math.max(18, y - 5)
+        );
+    });
+}
+
+
+function displayResults(data) {
+
+    if (!data.detections || data.detections.length === 0) {
+
+        result.innerHTML = `
+            <span class="status">No detections.</span>
+            <br>
+            The model did not return any crab-pot detections.
+        `;
+
+        clearBoxes();
+
+        return;
+    }
+
+    result.innerHTML = `
+        <span class="status">
+            ${data.detections.length} detection(s) found.
+        </span>
+    `;
+
+    data.detections.forEach((detection) => {
+
+        const confidence =
+            Math.round(detection.confidence * 100);
+
+        result.innerHTML += `
+            <div class="detection">
+                <strong>${detection.class}</strong>
+                — Confidence: ${confidence}%
+            </div>
+        `;
+    });
+
+    drawDetections(data.detections);
+}
+
+
+detectButton.addEventListener("click", async () => {
+
+    if (!selectedFile) return;
+
+    detectButton.disabled = true;
+
+    result.innerHTML = "Analyzing sonar image...";
+
+    const formData = new FormData();
+
+    formData.append("file", selectedFile);
+
+    try {
+
+        const response = await fetch(
+            "http://127.0.0.1:8000/api/detect",
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("API request failed");
+        }
+
+        const data = await response.json();
+
+        displayResults(data);
+
+    } catch (error) {
+
+        result.innerHTML = `
+            <span class="status">
+                Could not connect to the Marine Sonar API.
+            </span>
+            <br>
+            Make sure the backend is running on port 8000.
+        `;
+
+    } finally {
+
+        detectButton.disabled = false;
+
+    }
+});
+</script>
+
+</body>
+</html>
