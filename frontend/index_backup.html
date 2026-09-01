@@ -650,66 +650,6 @@
             color: var(--green) !important;
         }
 
-
-        /* NAVIGATION RECOMMENDATION */
-
-        .navigation-card {
-            margin-top: 20px;
-            padding: 17px;
-            border-radius: 12px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    rgba(255, 193, 7, 0.10),
-                    rgba(255, 193, 7, 0.025)
-                );
-
-            border: 1px solid rgba(255, 193, 7, 0.30);
-
-            box-shadow:
-                0 0 20px rgba(255, 193, 7, 0.05);
-        }
-
-        .navigation-header {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-
-            color: #ffd166;
-            font-size: 13px;
-            letter-spacing: .5px;
-            margin-bottom: 12px;
-        }
-
-        .risk-level {
-            display: inline-block;
-            padding: 6px 10px;
-            border-radius: 6px;
-
-            background: rgba(255, 193, 7, 0.12);
-            border: 1px solid rgba(255, 193, 7, 0.30);
-
-            color: #ffd166;
-            font-size: 11px;
-            font-weight: 800;
-            margin-bottom: 10px;
-        }
-
-        .recommended-action {
-            color: #f4fbff;
-            font-size: 15px;
-            font-weight: 800;
-            line-height: 1.4;
-            margin-bottom: 7px;
-        }
-
-        .risk-reason {
-            color: var(--muted);
-            font-size: 11px;
-            line-height: 1.5;
-        }
-
         /* RESULT MESSAGE */
 
         #result {
@@ -807,32 +747,6 @@
                 padding: 15px;
             }
         }
-                .target-intelligence {
-            margin-top: 14px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(255,255,255,0.08);
-        }
-
-        .intelligence-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 15px;
-            margin-top: 8px;
-        }
-
-        .intelligence-row span {
-            color: #7894a3;
-            font-size: 10px;
-            letter-spacing: .4px;
-        }
-
-        .intelligence-row strong {
-            color: #dff9ff;
-            font-size: 11px;
-            text-align: right;
-            max-width: 60%;
-        }
     </style>
 </head>
 
@@ -886,9 +800,6 @@
                 <div class="section-number">1</div>
                 UPLOAD SONAR IMAGE
             </div>
-            <div class="risk-reason" id="riskReason">
-    Waiting for analysis.
-</div>
 
             <div
                 class="upload-box"
@@ -1086,40 +997,6 @@
             </div>
 
 
-
-            <!-- NAVIGATION RECOMMENDATION -->
-
-            <div class="navigation-card" id="navigationCard">
-
-                <div class="navigation-header">
-                    <span>🧭</span>
-                    <strong>NAVIGATION RECOMMENDATION</strong>
-                </div>
-
-                <div class="risk-level" id="riskLevel">
-                    WAITING FOR ANALYSIS
-                </div>
-
-                <div class="recommended-action" id="recommendedAction">
-                    Upload a sonar image to generate a recommendation.
-                </div>
-
-               <div class="target-intelligence" id="targetIntelligence">
-
-    <div class="intelligence-row">
-        <span>📍 TARGET POSITION</span>
-        <strong id="targetPosition">—</strong>
-    </div>
-
-    <div class="intelligence-row">
-        <span>🧠 AI ASSESSMENT</span>
-        <strong id="aiAssessment">Waiting for analysis</strong>
-    </div>
-
-</div>
-
-            </div>
-
             <div class="model-info">
 
                 <div class="section-title">
@@ -1178,7 +1055,9 @@
 
 </main>
 
+
 <script>
+
 const API_URL = "http://127.0.0.1:8000";
 
 const imageInput = document.getElementById("imageInput");
@@ -1201,34 +1080,18 @@ const statNms = document.getElementById("statNms");
 
 const detectionList = document.getElementById("detectionList");
 
-const riskLevel =
-    document.getElementById("riskLevel");
-
-const recommendedAction =
-    document.getElementById("recommendedAction");
-
-const targetPosition =
-    document.getElementById("targetPosition");
-
-const aiAssessment =
-    document.getElementById("aiAssessment");
-
-const apiStatus =
-    document.getElementById("apiStatus");
+const apiStatus = document.getElementById("apiStatus");
 
 let selectedFile = null;
-let currentObjectURL = null;
 
 
-/* =========================================================
+/* =========================
    FILE SELECTION
-========================================================= */
+========================= */
 
-imageInput.addEventListener("change", function(event) {
+imageInput.addEventListener("change", () => {
 
-    const file =
-        event.target.files &&
-        event.target.files[0];
+    const file = imageInput.files[0];
 
     if (!file) {
         return;
@@ -1238,11 +1101,11 @@ imageInput.addEventListener("change", function(event) {
 });
 
 
-/* =========================================================
+/* =========================
    DRAG & DROP
-========================================================= */
+========================= */
 
-uploadBox.addEventListener("dragover", function(event) {
+uploadBox.addEventListener("dragover", (event) => {
 
     event.preventDefault();
 
@@ -1250,21 +1113,19 @@ uploadBox.addEventListener("dragover", function(event) {
 });
 
 
-uploadBox.addEventListener("dragleave", function() {
+uploadBox.addEventListener("dragleave", () => {
 
     uploadBox.classList.remove("dragover");
 });
 
 
-uploadBox.addEventListener("drop", function(event) {
+uploadBox.addEventListener("drop", (event) => {
 
     event.preventDefault();
 
     uploadBox.classList.remove("dragover");
 
-    const file =
-        event.dataTransfer.files &&
-        event.dataTransfer.files[0];
+    const file = event.dataTransfer.files[0];
 
     if (!file) {
         return;
@@ -1273,10 +1134,7 @@ uploadBox.addEventListener("drop", function(event) {
     if (!file.type.startsWith("image/")) {
 
         result.innerHTML = `
-            <span
-                class="status"
-                style="color:#ff4057;"
-            >
+            <span class="status">
                 ERROR
             </span>
             — Please select an image file.
@@ -1285,77 +1143,51 @@ uploadBox.addEventListener("drop", function(event) {
         return;
     }
 
+    selectedFile = file;
+
     handleFile(file);
 });
 
 
-/* =========================================================
+/* =========================
    HANDLE FILE
-========================================================= */
+========================= */
 
 function handleFile(file) {
 
-    if (!file) {
-        return;
-    }
-
-    if (!file.type.startsWith("image/")) {
-
-        result.innerHTML = `
-            <span
-                class="status"
-                style="color:#ff4057;"
-            >
-                ERROR
-            </span>
-            — Please select a valid image.
-        `;
-
-        return;
-    }
-
     selectedFile = file;
 
+    const objectURL = URL.createObjectURL(file);
 
-    /* Revoke old object URL */
+    preview.src = objectURL;
 
-    if (currentObjectURL) {
+    preview.onload = () => {
 
-        URL.revokeObjectURL(
-            currentObjectURL
-        );
+        emptyPreview.style.display = "none";
 
-        currentObjectURL = null;
-    }
+        preview.style.display = "block";
 
+        resizeCanvas();
 
-    /* Create new browser URL */
+        clearBoxes();
 
-    currentObjectURL =
-        URL.createObjectURL(file);
+        statSize.innerText =
+            `${preview.naturalWidth} × ${preview.naturalHeight}`;
+    };
 
+    detectButton.disabled = false;
 
-    /* Reset detection state */
-
-    clearBoxes();
-
-
-    targetCount.innerText =
-        "0 TARGETS DETECTED";
+    targetCount.innerText = "READY FOR ANALYSIS";
 
     analysisStatus.innerText =
-        "Image ready for AI analysis";
+        "Image loaded successfully";
 
-
-    statDetections.innerText =
-        "0";
-
-    statSize.innerText =
-        "—";
-
-    statConfidence.innerText =
-        "—";
-
+    result.innerHTML = `
+        <span class="status">
+            READY
+        </span>
+        — ${escapeHtml(file.name)}
+    `;
 
     detectionList.innerHTML = `
         <div
@@ -1365,172 +1197,34 @@ function handleFile(file) {
                 color:#557487;
             "
         >
-            Image ready.
             Click "RUN AI DETECTION".
         </div>
     `;
-
-
-    riskLevel.innerText =
-        "WAITING FOR ANALYSIS";
-
-    recommendedAction.innerText =
-        "Run AI detection to generate a recommendation.";
-
-    targetPosition.innerText =
-        "—";
-
-    aiAssessment.innerText =
-        "Waiting for analysis";
-
-
-    result.innerHTML = `
-        <span class="status">
-            IMAGE SELECTED
-        </span>
-        — ${escapeHtml(file.name)}
-    `;
-
-
-    /* =====================================================
-       LOAD IMAGE
-    ===================================================== */
-
-    preview.onload = function() {
-
-        preview.style.display =
-            "block";
-
-        emptyPreview.style.display =
-            "none";
-
-
-        resizeCanvas();
-
-        clearBoxes();
-
-
-        detectButton.disabled =
-            false;
-
-        detectButton.innerText =
-            "⚡ RUN AI DETECTION";
-
-
-        if (currentObjectURL) {
-
-            URL.revokeObjectURL(
-                currentObjectURL
-            );
-
-            currentObjectURL = null;
-        }
-    };
-
-
-    preview.onerror = function() {
-
-        preview.style.display =
-            "none";
-
-        emptyPreview.style.display =
-            "flex";
-
-
-        detectButton.disabled =
-            true;
-
-
-        result.innerHTML = `
-            <span
-                class="status"
-                style="color:#ff4057;"
-            >
-                ERROR
-            </span>
-            — Browser could not load this image.
-        `;
-
-
-        if (currentObjectURL) {
-
-            URL.revokeObjectURL(
-                currentObjectURL
-            );
-
-            currentObjectURL = null;
-        }
-    };
-
-
-    preview.src =
-        currentObjectURL;
 }
 
 
-/* =========================================================
-   CANVAS RESIZE
-========================================================= */
+/* =========================
+   CANVAS
+========================= */
 
 function resizeCanvas() {
 
-    if (
-        !preview.naturalWidth ||
-        !preview.naturalHeight
-    ) {
+    if (!preview.naturalWidth || !preview.naturalHeight) {
         return;
     }
 
+    const rect = preview.getBoundingClientRect();
 
-    const rect =
-        preview.getBoundingClientRect();
+    overlay.width = Math.round(rect.width);
+    overlay.height = Math.round(rect.height);
 
-
-    overlay.width =
-        Math.max(
-            1,
-            Math.round(rect.width)
-        );
-
-    overlay.height =
-        Math.max(
-            1,
-            Math.round(rect.height)
-        );
-
-
-    overlay.style.width =
-        `${rect.width}px`;
-
-    overlay.style.height =
-        `${rect.height}px`;
+    overlay.style.width = `${rect.width}px`;
+    overlay.style.height = `${rect.height}px`;
 }
-
-
-window.addEventListener(
-    "resize",
-    function() {
-
-        if (
-            preview.naturalWidth &&
-            preview.naturalHeight
-        ) {
-
-            resizeCanvas();
-        }
-    }
-);
-
-
-/* =========================================================
-   CLEAR BOXES
-========================================================= */
 
 function clearBoxes() {
 
-    const ctx =
-        overlay.getContext("2d");
-
+    const ctx = overlay.getContext("2d");
 
     ctx.clearRect(
         0,
@@ -1541,627 +1235,228 @@ function clearBoxes() {
 }
 
 
-/* =========================================================
+/* =========================
    DRAW DETECTIONS
-========================================================= */
+========================= */
 
 function drawDetections(detections) {
 
     clearBoxes();
 
+    const ctx = overlay.getContext("2d");
 
-    if (
-        !detections ||
-        detections.length === 0
-    ) {
-        return;
-    }
+    const rect = preview.getBoundingClientRect();
 
+const scaleX =
+    rect.width /
+    preview.naturalWidth;
 
-    if (
-        !preview.naturalWidth ||
-        !preview.naturalHeight
-    ) {
-        return;
-    }
+const scaleY =
+    rect.height /
+    preview.naturalHeight;
 
 
-    const ctx =
-        overlay.getContext("2d");
+    detections.forEach((detection, index) => {
+
+        const box = detection.bbox;
+
+        /*
+            IMPORTANT:
+            Backend returns:
+
+            x1
+            y1
+            x2
+            y2
+
+            Not x/y/width/height.
+        */
+
+        const x =
+            box.x1 * scaleX;
+
+        const y =
+            box.y1 * scaleY;
+
+        const width =
+            (box.x2 - box.x1) * scaleX;
+
+        const height =
+            (box.y2 - box.y1) * scaleY;
 
 
-    const rect =
-        preview.getBoundingClientRect();
+        /* BOX */
+
+        ctx.strokeStyle = "#ff4057";
+        ctx.lineWidth = 3;
+
+        ctx.shadowColor = "#ff4057";
+        ctx.shadowBlur = 8;
+
+        ctx.strokeRect(
+            x,
+            y,
+            width,
+            height
+        );
+
+        ctx.shadowBlur = 0;
 
 
-    /*
-        IMPORTANT
+        /* LABEL */
 
-        Backend returns:
-
-        x1
-        y1
-        x2
-        y2
-
-        These values are in ORIGINAL
-        IMAGE PIXEL coordinates.
-    */
-
-
-    const scaleX =
-        rect.width /
-        preview.naturalWidth;
-
-
-    const scaleY =
-        rect.height /
-        preview.naturalHeight;
-
-
-    detections.forEach(
-        function(detection) {
-
-            const box =
-                detection &&
-                detection.bbox;
-
-
-            if (!box) {
-                return;
-            }
-
-
-            const x1 =
-                Number(box.x1);
-
-            const y1 =
-                Number(box.y1);
-
-            const x2 =
-                Number(box.x2);
-
-            const y2 =
-                Number(box.y2);
-
-
-            if (
-                !Number.isFinite(x1) ||
-                !Number.isFinite(y1) ||
-                !Number.isFinite(x2) ||
-                !Number.isFinite(y2)
-            ) {
-                return;
-            }
-
-
-            const x =
-                x1 * scaleX;
-
-
-            const y =
-                y1 * scaleY;
-
-
-            const width =
-                Math.max(
-                    1,
-                    (x2 - x1) * scaleX
-                );
-
-
-            const height =
-                Math.max(
-                    1,
-                    (y2 - y1) * scaleY
-                );
-
-
-            const confidence =
-                Math.round(
-                    Number(
-                        detection.confidence || 0
-                    ) * 100
-                );
-
-
-            const className =
-                detection.class_name ||
-                detection.class ||
-                "target";
-
-
-            ctx.save();
-
-
-            /* BOX */
-
-            ctx.strokeStyle =
-                "#ff4057";
-
-            ctx.lineWidth =
-                3;
-
-            ctx.shadowColor =
-                "#ff4057";
-
-            ctx.shadowBlur =
-                8;
-
-
-            ctx.strokeRect(
-                x,
-                y,
-                width,
-                height
+        const confidence =
+            Math.round(
+                detection.confidence * 100
             );
 
 
-            ctx.shadowBlur =
-                0;
+        const label =
+            `${detection.class_name || detection.class || "target"} ${confidence}%`;
 
 
-            /* LABEL */
+        ctx.font = "bold 13px Arial";
 
-            const label =
-                `${className} ${confidence}%`;
-
-
-            ctx.font =
-                "bold 13px Arial";
+        const textWidth =
+            ctx.measureText(label).width;
 
 
-            const textWidth =
-                ctx.measureText(label).width;
+        ctx.fillStyle = "#ff4057";
+
+        ctx.fillRect(
+            x,
+            Math.max(0, y - 23),
+            textWidth + 14,
+            23
+        );
 
 
-            const labelHeight =
-                23;
+        ctx.fillStyle = "#ffffff";
 
+        ctx.fillText(
+            label,
+            x + 7,
+            Math.max(16, y - 7)
+        );
 
-            const labelY =
-                Math.max(
-                    0,
-                    y - labelHeight
-                );
-
-
-            ctx.fillStyle =
-                "#ff4057";
-
-
-            ctx.fillRect(
-                x,
-                labelY,
-                textWidth + 14,
-                labelHeight
-            );
-
-
-            ctx.fillStyle =
-                "#ffffff";
-
-
-            ctx.fillText(
-                label,
-                x + 7,
-                labelY + 16
-            );
-
-
-            ctx.restore();
-        }
-    );
+    });
 }
 
 
-/* =========================================================
-   RISK ANALYSIS
-========================================================= */
+/* =========================
+   DISPLAY RESULTS
+========================= */
+
+function displayResults(data) {
+
+    const detections =
+        data.detections || [];
+
+/* =========================
+   NAVIGATION / RISK ANALYSIS
+========================= */
 
 function calculateRisk(detection) {
 
     const confidence =
-        Number(
-            detection &&
-            detection.confidence || 0
-        );
-
+        Number(detection.confidence || 0);
 
     const box =
-        detection &&
         detection.bbox;
 
-
     if (!box) {
-
         return {
-
-            level:
-                "CAUTION",
-
-            action:
-                "REDUCE SPEED & INVESTIGATE",
-
+            level: "CAUTION",
+            action: "REDUCE SPEED & INVESTIGATE",
             reason:
                 "A potential underwater target was detected, but its position could not be determined."
         };
     }
 
-
     const imageWidth =
         preview.naturalWidth;
-
 
     const imageHeight =
         preview.naturalHeight;
 
-
-    if (
-        !imageWidth ||
-        !imageHeight
-    ) {
-
-        return {
-
-            level:
-                "CAUTION",
-
-            action:
-                "REDUCE SPEED & INVESTIGATE",
-
-            reason:
-                "A potential underwater target was detected, but image geometry is unavailable."
-        };
-    }
-
-
     const centerX =
-        (
-            Number(box.x1) +
-            Number(box.x2)
-        ) / 2;
-
+        (Number(box.x1) + Number(box.x2)) / 2;
 
     const centerY =
-        (
-            Number(box.y1) +
-            Number(box.y2)
-        ) / 2;
-
+        (Number(box.y1) + Number(box.y2)) / 2;
 
     const relativeX =
-        centerX /
-        imageWidth;
-
+        centerX / imageWidth;
 
     const relativeY =
-        centerY /
-        imageHeight;
-
+        centerY / imageHeight;
 
     /*
-        DEMO DECISION-SUPPORT HEURISTIC
-
-        This is NOT a real collision avoidance
-        or marine navigation system.
-
-        It combines:
-        - AI confidence
-        - target position
+       Central sonar corridor.
+       This is a DEMO decision-support heuristic,
+       not a real navigation system.
     */
-
 
     const nearCenter =
         relativeX >= 0.30 &&
         relativeX <= 0.70;
 
 
-    if (
-        confidence >= 0.50 &&
-        nearCenter
-    ) {
+    if (confidence >= 0.50 && nearCenter) {
 
         return {
-
-            level:
-                "HIGH RISK",
-
+            level: "HIGH RISK",
             action:
                 "REDUCE SPEED & CONSIDER ROUTE CHANGE",
-
             reason:
                 "High-confidence target detected within the central sonar corridor."
         };
+
     }
 
 
-    if (
-        confidence >= 0.20 &&
-        nearCenter
-    ) {
+    if (confidence >= 0.20 && nearCenter) {
 
         return {
-
-            level:
-                "MODERATE RISK",
-
+            level: "MODERATE RISK",
             action:
                 "REDUCE SPEED & INVESTIGATE",
-
             reason:
                 "Potential target detected near the central sonar corridor."
         };
+
     }
 
 
     if (nearCenter) {
 
         return {
-
-            level:
-                "CAUTION",
-
+            level: "CAUTION",
             action:
                 "MAINTAIN CAUTION & INVESTIGATE",
-
             reason:
                 "Low-confidence target detected near the central sonar corridor."
         };
+
     }
 
 
     return {
-
-        level:
-            "LOW RISK",
-
+        level: "LOW RISK",
         action:
             "MAINTAIN COURSE & MONITOR",
-
         reason:
             "Potential target detected outside the central sonar corridor."
     };
 }
-
-
-/* =========================================================
-   TARGET POSITION
-========================================================= */
-
-function getTargetPosition(detection) {
-
-    const box =
-        detection &&
-        detection.bbox;
-
-
-    if (
-        !box ||
-        !preview.naturalWidth ||
-        !preview.naturalHeight
-    ) {
-
-        return {
-
-            position:
-                "Position unavailable",
-
-            assessment:
-                "Target detected"
-        };
-    }
-
-
-    const centerX =
-        (
-            Number(box.x1) +
-            Number(box.x2)
-        ) / 2;
-
-
-    const centerY =
-        (
-            Number(box.y1) +
-            Number(box.y2)
-        ) / 2;
-
-
-    const relativeX =
-        centerX /
-        preview.naturalWidth;
-
-
-    const relativeY =
-        centerY /
-        preview.naturalHeight;
-
-
-    let horizontalPosition;
-
-
-    if (relativeX < 0.33) {
-
-        horizontalPosition =
-            "Left";
-
-    } else if (relativeX > 0.66) {
-
-        horizontalPosition =
-            "Right";
-
-    } else {
-
-        horizontalPosition =
-            "Center";
-    }
-
-
-    let verticalPosition;
-
-
-    if (relativeY < 0.33) {
-
-        verticalPosition =
-            "Far";
-
-    } else if (relativeY > 0.66) {
-
-        verticalPosition =
-            "Near";
-
-    } else {
-
-        verticalPosition =
-            "Mid-range";
-    }
-
-
-    const confidence =
-        Math.round(
-            Number(
-                detection.confidence || 0
-            ) * 100
-        );
-
-
-    return {
-
-        position:
-            `${horizontalPosition} • ${verticalPosition}`,
-
-        assessment:
-            `${confidence}% confidence target detected`
-    };
-}
-
-
-/* =========================================================
-   UPDATE NAVIGATION RECOMMENDATION
-========================================================= */
-
-function updateNavigationRecommendation(
-    detections
-) {
-
-    if (
-        !detections ||
-        detections.length === 0
-    ) {
-
-        riskLevel.innerText =
-            "NO TARGET";
-
-
-        recommendedAction.innerText =
-            "MAINTAIN COURSE & CONTINUE MONITORING";
-
-
-        targetPosition.innerText =
-            "No target detected";
-
-
-        aiAssessment.innerText =
-            "No potential underwater target identified.";
-
-
-        return;
-    }
-
-
-    const highestConfidenceDetection =
-        [...detections].sort(
-            function(a, b) {
-
-                return (
-                    Number(
-                        b.confidence || 0
-                    ) -
-                    Number(
-                        a.confidence || 0
-                    )
-                );
-            }
-        )[0];
-
-
-    const risk =
-        calculateRisk(
-            highestConfidenceDetection
-        );
-
-
-    riskLevel.innerText =
-        risk.level;
-
-
-    recommendedAction.innerText =
-        risk.action;
-
-
-    const location =
-        getTargetPosition(
-            highestConfidenceDetection
-        );
-
-
-    targetPosition.innerText =
-        location.position;
-
-
-    aiAssessment.innerText =
-        location.assessment;
-}
-
-
-/* =========================================================
-   DISPLAY RESULTS
-========================================================= */
-
-function displayResults(data) {
-
-    const detections =
-        Array.isArray(
-            data &&
-            data.detections
-        )
-            ? data.detections
-            : [];
-
+    /* COUNT */
 
     const count =
         detections.length;
 
 
-    /*
-        IMPORTANT:
-        Sort a COPY rather than changing
-        the API response array.
-    */
-
-    const sortedDetections =
-        [...detections].sort(
-            function(a, b) {
-
-                return (
-                    Number(
-                        b.confidence || 0
-                    ) -
-                    Number(
-                        a.confidence || 0
-                    )
-                );
-            }
-        );
-
-
-    /* =====================================================
-       COUNT
-    ===================================================== */
-
     targetCount.innerText =
         `${count} TARGET${count === 1 ? "" : "S"} DETECTED`;
-
 
     analysisStatus.innerText =
         count > 0
@@ -2169,73 +1464,35 @@ function displayResults(data) {
             : "No targets detected";
 
 
-    statDetections.innerText =
-        count;
+    statDetections.innerText = count;
 
 
-    /* =====================================================
-       IMAGE SIZE
-    ===================================================== */
-
-    if (data && data.image) {
+    if (data.image) {
 
         statSize.innerText =
             `${data.image.width} × ${data.image.height}`;
-
-    } else if (
-        preview.naturalWidth &&
-        preview.naturalHeight
-    ) {
-
-        statSize.innerText =
-            `${preview.naturalWidth} × ${preview.naturalHeight}`;
-
-    } else {
-
-        statSize.innerText =
-            "—";
     }
 
 
-    /* =====================================================
-       CONFIDENCE
-    ===================================================== */
+ if (count > 0) {
 
-    if (count > 0) {
+    const highestConfidence =
+        Math.max(
+            ...detections.map(
+                d => Number(d.confidence || 0)
+            )
+        );
 
-        const highestConfidence =
-            Math.max(
-                ...detections.map(
-                    function(d) {
+    statConfidence.innerText =
+        `${Math.round(highestConfidence * 100)}%`;
 
-                        return Number(
-                            d.confidence || 0
-                        );
-                    }
-                )
-            );
+} else {
 
-
-        statConfidence.innerText =
-            `${Math.round(
-                highestConfidence * 100
-            )}%`;
-
-    } else {
-
-        statConfidence.innerText =
-            "—";
-    }
+    statConfidence.innerText = "—";
+}
 
 
-    /* =====================================================
-       NMS IOU
-    ===================================================== */
-
-    if (
-        data &&
-        data.nms_iou_threshold !== undefined
-    ) {
+    if (data.nms_iou_threshold !== undefined) {
 
         statNms.innerText =
             Number(
@@ -2244,18 +1501,7 @@ function displayResults(data) {
     }
 
 
-    /* =====================================================
-       NAVIGATION
-    ===================================================== */
-
-    updateNavigationRecommendation(
-        sortedDetections
-    );
-
-
-    /* =====================================================
-       NO DETECTIONS
-    ===================================================== */
+    /* DETECTION LIST */
 
     if (count === 0) {
 
@@ -2271,9 +1517,7 @@ function displayResults(data) {
             </div>
         `;
 
-
         clearBoxes();
-
 
         result.innerHTML = `
             <span class="status">
@@ -2282,27 +1526,23 @@ function displayResults(data) {
             — No detections found.
         `;
 
-
         return;
     }
 
 
-    /* =====================================================
-       DETECTION LIST
-    ===================================================== */
-
-    detectionList.innerHTML =
-        "";
+    detectionList.innerHTML = "";
 
 
-    sortedDetections.forEach(
-        function(detection, index) {
+    detections
+        .sort(
+            (a, b) =>
+                b.confidence - a.confidence
+        )
+        .forEach((detection, index) => {
 
             const confidence =
                 Math.round(
-                    Number(
-                        detection.confidence || 0
-                    ) * 100
+                    detection.confidence * 100
                 );
 
 
@@ -2310,16 +1550,6 @@ function displayResults(data) {
                 detection.class_name ||
                 detection.class ||
                 "target";
-
-
-            const safeConfidence =
-                Math.max(
-                    0,
-                    Math.min(
-                        100,
-                        confidence
-                    )
-                );
 
 
             detectionList.innerHTML += `
@@ -2351,9 +1581,7 @@ function displayResults(data) {
 
                             <div
                                 class="confidence-fill"
-                                style="
-                                    width:${safeConfidence}%
-                                "
+                                style="width:${confidence}%"
                             ></div>
 
                         </div>
@@ -2367,22 +1595,11 @@ function displayResults(data) {
                 </div>
 
             `;
-        }
-    );
+        });
 
 
-    /* =====================================================
-       DRAW BOXES
-    ===================================================== */
+    drawDetections(detections);
 
-    drawDetections(
-        sortedDetections
-    );
-
-
-    /* =====================================================
-       RESULT MESSAGE
-    ===================================================== */
 
     result.innerHTML = `
         <span class="status">
@@ -2393,33 +1610,20 @@ function displayResults(data) {
 }
 
 
-/* =========================================================
+/* =========================
    RUN AI DETECTION
-========================================================= */
+========================= */
 
 detectButton.addEventListener(
     "click",
-    async function() {
+    async () => {
 
         if (!selectedFile) {
-
-            result.innerHTML = `
-                <span
-                    class="status"
-                    style="color:#ff4057;"
-                >
-                    ERROR
-                </span>
-                — Please select a sonar image first.
-            `;
-
             return;
         }
 
 
-        detectButton.disabled =
-            true;
-
+        detectButton.disabled = true;
 
         detectButton.innerText =
             "⟳ ANALYZING SONAR IMAGE...";
@@ -2450,9 +1654,7 @@ detectButton.addEventListener(
         `;
 
 
-        const formData =
-            new FormData();
-
+        const formData = new FormData();
 
         formData.append(
             "file",
@@ -2466,11 +1668,8 @@ detectButton.addEventListener(
                 await fetch(
                     `${API_URL}/api/detect`,
                     {
-                        method:
-                            "POST",
-
-                        body:
-                            formData
+                        method: "POST",
+                        body: formData
                     }
                 );
 
@@ -2480,28 +1679,19 @@ detectButton.addEventListener(
                 let errorMessage =
                     "API request failed.";
 
-
                 try {
 
                     const errorData =
                         await response.json();
 
-
-                    if (
-                        errorData &&
-                        errorData.detail
-                    ) {
-
+                    if (errorData.detail) {
                         errorMessage =
                             errorData.detail;
                     }
 
                 } catch (_) {}
 
-
-                throw new Error(
-                    errorMessage
-                );
+                throw new Error(errorMessage);
             }
 
 
@@ -2518,21 +1708,16 @@ detectButton.addEventListener(
             );
 
 
-            displayResults(
-                data
-            );
+            displayResults(data);
+
 
         } catch (error) {
 
-            console.error(
-                "Detection error:",
-                error
-            );
+            console.error(error);
 
 
             apiStatus.innerText =
                 "● API Error";
-
 
             apiStatus.classList.remove(
                 "connected"
@@ -2541,7 +1726,6 @@ detectButton.addEventListener(
 
             targetCount.innerText =
                 "ANALYSIS FAILED";
-
 
             analysisStatus.innerText =
                 "Could not connect to AI backend";
@@ -2555,30 +1739,9 @@ detectButton.addEventListener(
                         color:#ff7182;
                     "
                 >
-                    ${escapeHtml(
-                        error &&
-                        error.message
-                            ? error.message
-                            : "Unknown error"
-                    )}
+                    ${escapeHtml(error.message)}
                 </div>
             `;
-
-
-            riskLevel.innerText =
-                "ANALYSIS ERROR";
-
-
-            recommendedAction.innerText =
-                "CHECK BACKEND CONNECTION";
-
-
-            targetPosition.innerText =
-                "—";
-
-
-            aiAssessment.innerText =
-                "AI analysis could not be completed.";
 
 
             result.innerHTML = `
@@ -2589,19 +1752,12 @@ detectButton.addEventListener(
                     CONNECTION ERROR
                 </span>
                 <br>
-                ${escapeHtml(
-                    error &&
-                    error.message
-                        ? error.message
-                        : "Make sure FastAPI is running on port 8000."
-                )}
+                Make sure FastAPI is running on port 8000.
             `;
 
         } finally {
 
-            detectButton.disabled =
-                false;
-
+            detectButton.disabled = false;
 
             detectButton.innerText =
                 "⚡ RUN AI DETECTION";
@@ -2610,9 +1766,9 @@ detectButton.addEventListener(
 );
 
 
-/* =========================================================
+/* =========================
    HEALTH CHECK
-========================================================= */
+========================= */
 
 async function checkAPI() {
 
@@ -2625,10 +1781,7 @@ async function checkAPI() {
 
 
         if (!response.ok) {
-
-            throw new Error(
-                "Health check failed"
-            );
+            throw new Error();
         }
 
 
@@ -2637,7 +1790,6 @@ async function checkAPI() {
 
 
         apiStatus.innerText =
-            data &&
             data.model_loaded
                 ? "● Connected"
                 : "● API Online";
@@ -2648,35 +1800,19 @@ async function checkAPI() {
         );
 
 
-        if (
-            data &&
-            data.model_loaded
-        ) {
+        if (data.model_loaded) {
 
-            const modelName =
-                document.getElementById(
-                    "modelName"
-                );
-
-
-            if (modelName) {
-
-                modelName.innerText =
-                    "groupval_onlineaug_1024";
-            }
+            document.getElementById(
+                "modelName"
+            ).innerText =
+                "groupval_onlineaug_1024";
         }
+
 
     } catch (error) {
 
-        console.error(
-            "API health check failed:",
-            error
-        );
-
-
         apiStatus.innerText =
             "● Offline";
-
 
         apiStatus.classList.remove(
             "connected"
@@ -2685,44 +1821,22 @@ async function checkAPI() {
 }
 
 
-/* =========================================================
+/* =========================
    HTML ESCAPE
-========================================================= */
+========================= */
 
 function escapeHtml(value) {
 
     return String(value)
-
-        .replaceAll(
-            "&",
-            "&amp;"
-        )
-
-        .replaceAll(
-            "<",
-            "&lt;"
-        )
-
-        .replaceAll(
-            ">",
-            "&gt;"
-        )
-
-        .replaceAll(
-            '"',
-            "&quot;"
-        )
-
-        .replaceAll(
-            "'",
-            "&#039;"
-        );
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }
 
 
-/* =========================================================
-   START
-========================================================= */
+/* START */
 
 checkAPI();
 

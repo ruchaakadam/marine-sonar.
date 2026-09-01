@@ -23,20 +23,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
 # ============================================================
 # MODEL CONFIGURATION
 # ============================================================
 
-MODEL_PATH = Path(
-    r"D:\sih\marine-sonar\runs\detect\runs\detect"
-    r"\groupval_onlineaug_1024\weights\best.pt"
-)
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-CONFIDENCE = 0.05
+MODEL_PATH = BASE_DIR / "models" / "best.pt"
+
+CONFIDENCE = 0.20
 NMS_IOU = 0.40
-
 
 print("=" * 70)
 print("LOADING MARINE SONAR MODEL")
@@ -147,11 +143,12 @@ async def detect(file: UploadFile = File(...)):
 
     try:
         results = model.predict(
-            source=image,
-            conf=CONFIDENCE,
-            iou=NMS_IOU,
-            verbose=False,
-        )
+    source=image,
+    conf=CONFIDENCE,
+    iou=NMS_IOU,
+    imgsz=1024,
+    verbose=False,
+)
 
     except Exception as e:
         raise HTTPException(
