@@ -3,181 +3,1247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marine Sonar Detection</title>
+
+    <title>Marine Sonar AI</title>
 
     <style>
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --cyan: #00e5ff;
+            --cyan-dark: #00a8c7;
+            --blue: #087ea4;
+            --purple: #7c3aed;
+            --green: #00f5a0;
+            --red: #ff4057;
+            --bg: #020b14;
+            --panel: rgba(3, 20, 34, 0.88);
+            --border: rgba(0, 229, 255, 0.25);
+            --text: #f4fbff;
+            --muted: #8ba7b8;
         }
 
         body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f7f9;
-            color: #17212b;
+            min-height: 100vh;
+            font-family: Inter, Arial, Helvetica, sans-serif;
+            color: var(--text);
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(1, 12, 23, 0.70),
+                    rgba(1, 10, 18, 0.96)
+                ),
+                radial-gradient(
+                    circle at 50% 0%,
+                    rgba(0, 229, 255, 0.18),
+                    transparent 40%
+                ),
+                linear-gradient(
+                    135deg,
+                    #031522 0%,
+                    #020912 45%,
+                    #031724 100%
+                );
+
+            overflow-x: hidden;
         }
+
+        /* Ocean glow */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+
+            background:
+                radial-gradient(
+                    circle at 15% 20%,
+                    rgba(0, 229, 255, 0.08),
+                    transparent 25%
+                ),
+                radial-gradient(
+                    circle at 85% 70%,
+                    rgba(124, 58, 237, 0.08),
+                    transparent 30%
+                );
+
+            z-index: -1;
+        }
+
+        /* Bubbles */
+        body::after {
+            content: "";
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            left: -100px;
+            bottom: -100px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 229, 255, 0.08);
+            box-shadow:
+                150px -250px 0 -80px rgba(0,229,255,0.08),
+                700px -500px 0 -100px rgba(0,229,255,0.06),
+                1000px -100px 0 -60px rgba(0,229,255,0.06);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* HEADER */
+
+        header {
+            height: 105px;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.35);
+
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(1, 12, 22, 0.96),
+                    rgba(3, 29, 45, 0.82),
+                    rgba(1, 12, 22, 0.96)
+                );
+
+            box-shadow:
+                0 10px 50px rgba(0, 0, 0, 0.35),
+                inset 0 -1px 0 rgba(0, 229, 255, 0.08);
+
+            display: flex;
+            align-items: center;
+        }
+
+        .header-inner {
+            width: min(1400px, 94%);
+            margin: auto;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .brand-icon {
+            width: 58px;
+            height: 58px;
+
+            border: 2px solid var(--cyan);
+            border-radius: 50%;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            color: var(--cyan);
+            font-size: 27px;
+
+            box-shadow:
+                0 0 18px rgba(0,229,255,0.35),
+                inset 0 0 15px rgba(0,229,255,0.08);
+        }
+
+        .brand h1 {
+            font-size: 28px;
+            letter-spacing: 1px;
+        }
+
+        .brand h1 span {
+            color: var(--cyan);
+        }
+
+        .brand p {
+            color: var(--muted);
+            margin-top: 5px;
+            font-size: 13px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            padding: 13px 20px;
+
+            border: 1px solid rgba(0, 245, 160, 0.25);
+            border-radius: 10px;
+
+            background: rgba(0, 245, 160, 0.06);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--green);
+
+            box-shadow:
+                0 0 10px var(--green),
+                0 0 20px rgba(0,245,160,0.5);
+        }
+
+        .system-status strong {
+            color: var(--green);
+            font-size: 13px;
+        }
+
+        .system-status small {
+            display: block;
+            color: var(--muted);
+            margin-top: 3px;
+        }
+
+        /* MAIN */
 
         .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 40px 20px;
+            width: min(1400px, 94%);
+            margin: 30px auto 50px;
         }
 
-        h1 {
-            margin-bottom: 8px;
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1.55fr 1fr;
+            gap: 20px;
         }
 
-        .subtitle {
-            color: #667;
-            margin-bottom: 30px;
+        .panel {
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(5, 28, 45, 0.90),
+                    rgba(2, 13, 24, 0.94)
+                );
+
+            border: 1px solid var(--border);
+            border-radius: 16px;
+
+            box-shadow:
+                0 15px 50px rgba(0,0,0,0.35),
+                inset 0 1px 0 rgba(255,255,255,0.03);
+
+            backdrop-filter: blur(14px);
         }
 
-        .card {
-            background: white;
-            border-radius: 12px;
+        .left-panel {
             padding: 24px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
 
-        input {
-            margin: 15px 0;
+        .right-panel {
+            padding: 24px;
         }
 
-        button {
-            display: block;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            background: #146c94;
-            color: white;
-            font-size: 16px;
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            color: var(--cyan);
+            font-size: 15px;
+            font-weight: 700;
+
+            letter-spacing: .5px;
+            margin-bottom: 15px;
+        }
+
+        .section-number {
+            width: 25px;
+            height: 25px;
+
+            border-radius: 50%;
+            background: rgba(0,229,255,0.1);
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            border: 1px solid rgba(0,229,255,0.4);
+        }
+
+        /* UPLOAD */
+
+        .upload-box {
+            min-height: 180px;
+
+            border: 1px dashed rgba(0,229,255,0.55);
+            border-radius: 13px;
+
+            background:
+                radial-gradient(
+                    circle at center,
+                    rgba(0,229,255,0.07),
+                    transparent 65%
+                );
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+
             cursor: pointer;
+            transition: .25s;
         }
 
-        button:hover {
-            background: #0f5878;
+        .upload-box:hover,
+        .upload-box.dragover {
+            border-color: var(--cyan);
+            background: rgba(0,229,255,0.08);
+
+            box-shadow:
+                0 0 30px rgba(0,229,255,0.1);
         }
 
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .upload-icon {
+            font-size: 45px;
+            color: var(--cyan);
+            margin-bottom: 12px;
+
+            text-shadow: 0 0 20px rgba(0,229,255,0.6);
+        }
+
+        .upload-box h3 {
+            font-size: 16px;
+            margin-bottom: 7px;
+        }
+
+        .upload-box p {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .choose-button {
+            display: inline-block;
+            margin-top: 16px;
+
+            padding: 11px 25px;
+
+            border-radius: 8px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #00b8d9,
+                    #16c9ef
+                );
+
+            color: #00121c;
+            font-weight: 800;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 0 20px rgba(0,229,255,0.2);
+        }
+
+        #imageInput {
+            display: none;
+        }
+
+        /* PREVIEW */
+
+        .preview-section {
+            margin-top: 24px;
         }
 
         .image-container {
             position: relative;
-            display: inline-block;
-            max-width: 100%;
-            margin-top: 20px;
+            width: 100%;
+
+            min-height: 300px;
+
+            background: #000914;
+
+            border: 1px solid rgba(0,229,255,0.4);
+            border-radius: 13px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 0 25px rgba(0,229,255,0.08);
         }
 
         #preview {
             display: none;
-            max-width: 100%;
-            max-height: 600px;
-            border-radius: 8px;
+
+            width: 100%;
+            height: auto;
+            max-height: 650px;
+
+            object-fit: contain;
         }
 
         #overlay {
             position: absolute;
-            left: 0;
-            top: 0;
+            inset: 0;
+
+            width: 100%;
+            height: 100%;
+
             pointer-events: none;
         }
 
-        #result {
-            margin-top: 20px;
-            padding: 15px;
-            background: #eef3f6;
-            border-radius: 8px;
+        .empty-preview {
+            min-height: 300px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: #4f7183;
+            font-size: 14px;
+        }
+
+        /* BUTTON */
+
+        #detectButton {
+            width: 100%;
+            margin-top: 18px;
+
+            padding: 16px;
+
+            border: none;
+            border-radius: 10px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #06c8e8,
+                    #4f46e5,
+                    #7c3aed
+                );
+
+            color: white;
+
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: .7px;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 0 25px rgba(0,229,255,0.2);
+
+            transition: .25s;
+        }
+
+        #detectButton:hover:not(:disabled) {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 0 35px rgba(0,229,255,0.35);
+        }
+
+        #detectButton:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        /* RIGHT PANEL */
+
+        .success-card {
+            padding: 18px;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(0,245,160,0.12),
+                    rgba(0,245,160,0.03)
+                );
+
+            border: 1px solid rgba(0,245,160,0.22);
+
+            display: flex;
+            align-items: center;
+            gap: 15px;
+
+            margin-bottom: 17px;
+        }
+
+        .success-icon {
+            width: 48px;
+            height: 48px;
+
+            border-radius: 50%;
+
+            border: 2px solid var(--green);
+
+            color: var(--green);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 22px;
+
+            box-shadow:
+                0 0 20px rgba(0,245,160,0.25);
+        }
+
+        .success-card h2 {
+            color: var(--green);
+            font-size: 18px;
+        }
+
+        .success-card p {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        /* STATS */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+
+            margin-bottom: 22px;
+        }
+
+        .stat {
+            padding: 15px 10px;
+
+            background: rgba(8, 31, 48, 0.8);
+
+            border: 1px solid rgba(0,229,255,0.13);
+            border-radius: 10px;
+
+            text-align: center;
+        }
+
+        .stat-value {
+            color: var(--cyan);
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 10px;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        /* DETECTIONS */
+
+        .detection-list {
+            max-height: 370px;
+            overflow-y: auto;
+
+            padding-right: 5px;
         }
 
         .detection {
-            padding: 10px;
-            margin-top: 8px;
-            background: white;
+            display: grid;
+            grid-template-columns: 36px 1fr auto;
+            align-items: center;
+            gap: 10px;
+
+            padding: 12px;
+
+            margin-bottom: 8px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(255,64,87,0.08),
+                    rgba(255,64,87,0.02)
+                );
+
+            border: 1px solid rgba(255,64,87,0.18);
+            border-left: 3px solid var(--red);
+
+            border-radius: 8px;
+        }
+
+        .target-icon {
+            width: 30px;
+            height: 30px;
+
+            border-radius: 50%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: var(--red);
+
+            border: 1px solid rgba(255,64,87,0.4);
+        }
+
+        .detection strong {
+            font-size: 13px;
+        }
+
+        .confidence-bar {
+            height: 4px;
+            margin-top: 6px;
+
+            background: #172c39;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: var(--red);
+        }
+
+        .confidence {
+            color: #ff7182;
+
+            padding: 5px 8px;
+
+            border: 1px solid rgba(255,64,87,0.35);
             border-radius: 6px;
+
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* MODEL INFO */
+
+        .model-info {
+            margin-top: 22px;
+        }
+
+        .info-box {
+            border: 1px solid rgba(0,229,255,0.13);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+
+            padding: 10px 13px;
+
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+
+            font-size: 12px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-row span:first-child {
+            color: var(--muted);
+        }
+
+        .info-row span:last-child {
+            text-align: right;
+            color: #d9edf5;
+        }
+
+        .connected {
+            color: var(--green) !important;
+        }
+
+        /* RESULT MESSAGE */
+
+        #result {
+            margin-top: 15px;
+
+            padding: 13px;
+
+            background: rgba(0,229,255,0.04);
+
+            border: 1px solid rgba(0,229,255,0.1);
+
+            border-radius: 9px;
+
+            color: var(--muted);
+
+            font-size: 13px;
         }
 
         .status {
-            font-weight: bold;
+            color: var(--cyan);
+            font-weight: 700;
+        }
+
+        /* FOOTER */
+
+        footer {
+            text-align: center;
+
+            margin-top: 25px;
+
+            color: #4e7d90;
+
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        footer span {
+            color: var(--cyan);
+        }
+
+        /* SCROLLBAR */
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #03101a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #07556b;
+            border-radius: 10px;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 1000px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .right-panel {
+                order: 2;
+            }
+        }
+
+        @media (max-width: 600px) {
+            header {
+                height: auto;
+                padding: 18px 0;
+            }
+
+            .header-inner {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .brand h1 {
+                font-size: 22px;
+            }
+
+            .brand-icon {
+                width: 48px;
+                height: 48px;
+            }
+
+            .container {
+                width: 94%;
+            }
+
+            .left-panel,
+            .right-panel {
+                padding: 15px;
+            }
         }
     </style>
 </head>
 
 <body>
 
-<div class="container">
+<header>
+    <div class="header-inner">
 
-    <h1>Marine Sonar Detection</h1>
+        <div class="brand">
 
-    <p class="subtitle">
-        Upload a sonar image to detect potential crab pots.
-    </p>
+            <div class="brand-icon">
+                ◉
+            </div>
 
-    <div class="card">
+            <div>
+                <h1>
+                    MARINE SONAR <span>AI</span>
+                </h1>
 
-        <input id="imageInput" type="file" accept="image/*">
+                <p>
+                    Automatic Underwater Target Detection
+                </p>
+            </div>
 
-        <button id="detectButton" disabled>
-            Detect Crab Pots
-        </button>
-
-        <div class="image-container">
-            <img id="preview" alt="Sonar preview">
-            <canvas id="overlay"></canvas>
         </div>
 
-        <div id="result">
-            Select an image to begin.
+        <div class="system-status">
+
+            <div class="status-dot"></div>
+
+            <div>
+                <strong>SYSTEM ONLINE</strong>
+                <small>AI Model Ready</small>
+            </div>
+
         </div>
 
     </div>
+</header>
 
-</div>
+
+<main class="container">
+
+    <div class="dashboard">
+
+        <!-- LEFT SIDE -->
+
+        <section class="panel left-panel">
+
+            <div class="section-title">
+                <div class="section-number">1</div>
+                UPLOAD SONAR IMAGE
+            </div>
+
+            <div
+                class="upload-box"
+                id="uploadBox"
+            >
+
+                <div>
+
+                    <div class="upload-icon">
+                        ⇧
+                    </div>
+
+                    <h3>
+                        DRAG & DROP YOUR IMAGE HERE
+                    </h3>
+
+                    <p>
+                        Upload a sonar image to detect underwater targets
+                    </p>
+
+                    <label
+                        for="imageInput"
+                        class="choose-button"
+                    >
+                        CHOOSE IMAGE
+                    </label>
+
+                    <p style="margin-top:12px;">
+                        Supported: PNG, JPG, JPEG, WEBP
+                    </p>
+
+                </div>
+
+            </div>
+
+            <input
+                id="imageInput"
+                type="file"
+                accept="image/png,image/jpeg,image/jpg,image/webp"
+            >
+
+
+            <div class="preview-section">
+
+                <div class="section-title">
+                    <div class="section-number">2</div>
+                    SONAR PREVIEW & DETECTION
+                </div>
+
+                <div class="image-container">
+
+                    <div
+                        class="empty-preview"
+                        id="emptyPreview"
+                    >
+                        Select a sonar image to begin analysis.
+                    </div>
+
+                    <img
+                        id="preview"
+                        alt="Sonar preview"
+                    >
+
+                    <canvas id="overlay"></canvas>
+
+                </div>
+
+            </div>
+
+
+            <button
+                id="detectButton"
+                disabled
+            >
+                ⚡ RUN AI DETECTION
+            </button>
+
+
+            <div id="result">
+                <span class="status">READY</span>
+                — Upload an image to begin.
+            </div>
+
+        </section>
+
+
+        <!-- RIGHT SIDE -->
+
+        <aside class="panel right-panel">
+
+            <div class="section-title">
+                📊 DETECTION RESULTS
+            </div>
+
+
+            <div
+                class="success-card"
+                id="successCard"
+            >
+
+                <div class="success-icon">
+                    ✓
+                </div>
+
+                <div>
+                    <h2 id="targetCount">
+                        0 TARGETS DETECTED
+                    </h2>
+
+                    <p id="analysisStatus">
+                        Waiting for AI analysis
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="stats">
+
+                <div class="stat">
+                    <div
+                        class="stat-value"
+                        id="statDetections"
+                    >
+                        0
+                    </div>
+
+                    <div class="stat-label">
+                        Detections
+                    </div>
+                </div>
+
+
+                <div class="stat">
+                    <div
+                        class="stat-value"
+                        id="statSize"
+                    >
+                        —
+                    </div>
+
+                    <div class="stat-label">
+                        Image Size
+                    </div>
+                </div>
+
+
+                <div class="stat">
+                    <div
+                        class="stat-value"
+                        id="statConfidence"
+                    >
+                        0.05
+                    </div>
+
+                    <div class="stat-label">
+                        Confidence
+                    </div>
+                </div>
+
+
+                <div class="stat">
+                    <div
+                        class="stat-value"
+                        id="statNms"
+                    >
+                        0.40
+                    </div>
+
+                    <div class="stat-label">
+                        NMS IoU
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="section-title">
+                🎯 DETECTED TARGETS
+            </div>
+
+            <div
+                class="detection-list"
+                id="detectionList"
+            >
+                <div
+                    style="
+                        text-align:center;
+                        padding:25px;
+                        color:#557487;
+                    "
+                >
+                    No detections yet.
+                </div>
+            </div>
+
+
+            <div class="model-info">
+
+                <div class="section-title">
+                    ℹ MODEL INFORMATION
+                </div>
+
+                <div class="info-box">
+
+                    <div class="info-row">
+                        <span>Model</span>
+                        <span id="modelName">
+                            Marine Sonar YOLO
+                        </span>
+                    </div>
+
+                    <div class="info-row">
+                        <span>Framework</span>
+                        <span>YOLOv8</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span>API Status</span>
+                        <span
+                            class="connected"
+                            id="apiStatus"
+                        >
+                            ● Connected
+                        </span>
+                    </div>
+
+                    <div class="info-row">
+                        <span>Backend</span>
+                        <span>FastAPI</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span>Detection Class</span>
+                        <span>Target</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+
+    <footer>
+        ≋ &nbsp; <span>POWERED BY AI</span>
+        &nbsp; • &nbsp;
+        <span>TRAINED FOR MARINE EXPLORATION</span>
+        &nbsp; ≋
+    </footer>
+
+</main>
+
 
 <script>
+
+const API_URL = "http://127.0.0.1:8000";
+
 const imageInput = document.getElementById("imageInput");
+const uploadBox = document.getElementById("uploadBox");
 const detectButton = document.getElementById("detectButton");
+
 const preview = document.getElementById("preview");
 const overlay = document.getElementById("overlay");
+const emptyPreview = document.getElementById("emptyPreview");
+
 const result = document.getElementById("result");
+
+const targetCount = document.getElementById("targetCount");
+const analysisStatus = document.getElementById("analysisStatus");
+
+const statDetections = document.getElementById("statDetections");
+const statSize = document.getElementById("statSize");
+const statConfidence = document.getElementById("statConfidence");
+const statNms = document.getElementById("statNms");
+
+const detectionList = document.getElementById("detectionList");
+
+const apiStatus = document.getElementById("apiStatus");
 
 let selectedFile = null;
 
+
+/* =========================
+   FILE SELECTION
+========================= */
+
 imageInput.addEventListener("change", () => {
 
-    selectedFile = imageInput.files[0];
+    const file = imageInput.files[0];
 
-    if (!selectedFile) {
-        detectButton.disabled = true;
-        preview.style.display = "none";
+    if (!file) {
         return;
     }
 
-    preview.src = URL.createObjectURL(selectedFile);
+    handleFile(file);
+});
+
+
+/* =========================
+   DRAG & DROP
+========================= */
+
+uploadBox.addEventListener("dragover", (event) => {
+
+    event.preventDefault();
+
+    uploadBox.classList.add("dragover");
+});
+
+
+uploadBox.addEventListener("dragleave", () => {
+
+    uploadBox.classList.remove("dragover");
+});
+
+
+uploadBox.addEventListener("drop", (event) => {
+
+    event.preventDefault();
+
+    uploadBox.classList.remove("dragover");
+
+    const file = event.dataTransfer.files[0];
+
+    if (!file) {
+        return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+
+        result.innerHTML = `
+            <span class="status">
+                ERROR
+            </span>
+            — Please select an image file.
+        `;
+
+        return;
+    }
+
+    selectedFile = file;
+
+    handleFile(file);
+});
+
+
+/* =========================
+   HANDLE FILE
+========================= */
+
+function handleFile(file) {
+
+    selectedFile = file;
+
+    const objectURL = URL.createObjectURL(file);
+
+    preview.src = objectURL;
 
     preview.onload = () => {
-        overlay.width = preview.clientWidth;
-        overlay.height = preview.clientHeight;
-        clearBoxes();
-    };
 
-    preview.style.display = "block";
+        emptyPreview.style.display = "none";
+
+        preview.style.display = "block";
+
+        resizeCanvas();
+
+        clearBoxes();
+
+        statSize.innerText =
+            `${preview.naturalWidth} × ${preview.naturalHeight}`;
+    };
 
     detectButton.disabled = false;
 
+    targetCount.innerText = "READY FOR ANALYSIS";
+
+    analysisStatus.innerText =
+        "Image loaded successfully";
+
     result.innerHTML = `
-        <span class="status">Ready.</span>
-        Image selected: ${selectedFile.name}
+        <span class="status">
+            READY
+        </span>
+        — ${escapeHtml(file.name)}
     `;
+
+    detectionList.innerHTML = `
+        <div
+            style="
+                text-align:center;
+                padding:25px;
+                color:#557487;
+            "
+        >
+            Click "RUN AI DETECTION".
+        </div>
+    `;
+}
+
+
+/* =========================
+   CANVAS
+========================= */
+
+function resizeCanvas() {
+
+    if (!preview.naturalWidth) {
+        return;
+    }
+
+    overlay.width = preview.clientWidth;
+    overlay.height = preview.clientHeight;
+}
+
+
+window.addEventListener("resize", () => {
+
+    if (preview.style.display !== "none") {
+
+        resizeCanvas();
+
+    }
 });
 
 
 function clearBoxes() {
+
     const ctx = overlay.getContext("2d");
-    ctx.clearRect(0, 0, overlay.width, overlay.height);
+
+    ctx.clearRect(
+        0,
+        0,
+        overlay.width,
+        overlay.height
+    );
 }
 
+
+/* =========================
+   DRAW DETECTIONS
+========================= */
 
 function drawDetections(detections) {
 
@@ -185,20 +1251,51 @@ function drawDetections(detections) {
 
     const ctx = overlay.getContext("2d");
 
-    const scaleX = preview.clientWidth / preview.naturalWidth;
-    const scaleY = preview.clientHeight / preview.naturalHeight;
+    const scaleX =
+        preview.clientWidth /
+        preview.naturalWidth;
 
-    detections.forEach((detection) => {
+    const scaleY =
+        preview.clientHeight /
+        preview.naturalHeight;
+
+
+    detections.forEach((detection, index) => {
 
         const box = detection.bbox;
 
-        const x = box.x * scaleX;
-        const y = box.y * scaleY;
-        const width = box.width * scaleX;
-        const height = box.height * scaleY;
+        /*
+            IMPORTANT:
+            Backend returns:
 
-        ctx.strokeStyle = "#ff0000";
+            x1
+            y1
+            x2
+            y2
+
+            Not x/y/width/height.
+        */
+
+        const x =
+            box.x1 * scaleX;
+
+        const y =
+            box.y1 * scaleY;
+
+        const width =
+            (box.x2 - box.x1) * scaleX;
+
+        const height =
+            (box.y2 - box.y1) * scaleY;
+
+
+        /* BOX */
+
+        ctx.strokeStyle = "#ff4057";
         ctx.lineWidth = 3;
+
+        ctx.shadowColor = "#ff4057";
+        ctx.shadowBlur = 8;
 
         ctx.strokeRect(
             x,
@@ -207,105 +1304,441 @@ function drawDetections(detections) {
             height
         );
 
-        ctx.fillStyle = "#ff0000";
-        ctx.font = "16px Arial";
+        ctx.shadowBlur = 0;
+
+
+        /* LABEL */
 
         const confidence =
-            Math.round(detection.confidence * 100);
+            Math.round(
+                detection.confidence * 100
+            );
+
+
+        const label =
+            `${detection.class_name || detection.class || "target"} ${confidence}%`;
+
+
+        ctx.font = "bold 13px Arial";
+
+        const textWidth =
+            ctx.measureText(label).width;
+
+
+        ctx.fillStyle = "#ff4057";
+
+        ctx.fillRect(
+            x,
+            Math.max(0, y - 23),
+            textWidth + 14,
+            23
+        );
+
+
+        ctx.fillStyle = "#ffffff";
 
         ctx.fillText(
-            `${detection.class} ${confidence}%`,
-            x,
-            Math.max(18, y - 5)
+            label,
+            x + 7,
+            Math.max(16, y - 7)
         );
+
     });
 }
 
 
+/* =========================
+   DISPLAY RESULTS
+========================= */
+
 function displayResults(data) {
 
-    if (!data.detections || data.detections.length === 0) {
+    const detections =
+        data.detections || [];
 
-        result.innerHTML = `
-            <span class="status">No detections.</span>
-            <br>
-            The model did not return any crab-pot detections.
+
+    /* COUNT */
+
+    const count =
+        detections.length;
+
+
+    targetCount.innerText =
+        `${count} TARGET${count === 1 ? "" : "S"} DETECTED`;
+
+    analysisStatus.innerText =
+        count > 0
+            ? "AI analysis completed successfully"
+            : "No targets detected";
+
+
+    statDetections.innerText = count;
+
+
+    if (data.image) {
+
+        statSize.innerText =
+            `${data.image.width} × ${data.image.height}`;
+    }
+
+
+    if (data.confidence_threshold !== undefined) {
+
+        statConfidence.innerText =
+            Number(
+                data.confidence_threshold
+            ).toFixed(2);
+    }
+
+
+    if (data.nms_iou_threshold !== undefined) {
+
+        statNms.innerText =
+            Number(
+                data.nms_iou_threshold
+            ).toFixed(2);
+    }
+
+
+    /* DETECTION LIST */
+
+    if (count === 0) {
+
+        detectionList.innerHTML = `
+            <div
+                style="
+                    text-align:center;
+                    padding:30px;
+                    color:#557487;
+                "
+            >
+                No underwater targets detected.
+            </div>
         `;
 
         clearBoxes();
 
+        result.innerHTML = `
+            <span class="status">
+                ANALYSIS COMPLETE
+            </span>
+            — No detections found.
+        `;
+
         return;
     }
 
+
+    detectionList.innerHTML = "";
+
+
+    detections
+        .sort(
+            (a, b) =>
+                b.confidence - a.confidence
+        )
+        .forEach((detection, index) => {
+
+            const confidence =
+                Math.round(
+                    detection.confidence * 100
+                );
+
+
+            const className =
+                detection.class_name ||
+                detection.class ||
+                "target";
+
+
+            detectionList.innerHTML += `
+
+                <div class="detection">
+
+                    <div class="target-icon">
+                        ◎
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            ${escapeHtml(className)}
+                        </strong>
+
+                        <div
+                            style="
+                                color:#7894a3;
+                                font-size:10px;
+                                margin-top:2px;
+                            "
+                        >
+                            Target ${index + 1}
+                            • Confidence ${confidence}%
+                        </div>
+
+                        <div class="confidence-bar">
+
+                            <div
+                                class="confidence-fill"
+                                style="width:${confidence}%"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="confidence">
+                        ${confidence}%
+                    </div>
+
+                </div>
+
+            `;
+        });
+
+
+    drawDetections(detections);
+
+
     result.innerHTML = `
         <span class="status">
-            ${data.detections.length} detection(s) found.
+            ANALYSIS COMPLETE
         </span>
+        — ${count} potential target(s) detected.
     `;
-
-    data.detections.forEach((detection) => {
-
-        const confidence =
-            Math.round(detection.confidence * 100);
-
-        result.innerHTML += `
-            <div class="detection">
-                <strong>${detection.class}</strong>
-                — Confidence: ${confidence}%
-            </div>
-        `;
-    });
-
-    drawDetections(data.detections);
 }
 
 
-detectButton.addEventListener("click", async () => {
+/* =========================
+   RUN AI DETECTION
+========================= */
 
-    if (!selectedFile) return;
+detectButton.addEventListener(
+    "click",
+    async () => {
 
-    detectButton.disabled = true;
-
-    result.innerHTML = "Analyzing sonar image...";
-
-    const formData = new FormData();
-
-    formData.append("file", selectedFile);
-
-    try {
-
-        const response = await fetch(
-            "http://127.0.0.1:8000/api/detect",
-            {
-                method: "POST",
-                body: formData
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error("API request failed");
+        if (!selectedFile) {
+            return;
         }
 
-        const data = await response.json();
 
-        displayResults(data);
+        detectButton.disabled = true;
 
-    } catch (error) {
+        detectButton.innerText =
+            "⟳ ANALYZING SONAR IMAGE...";
+
 
         result.innerHTML = `
             <span class="status">
-                Could not connect to the Marine Sonar API.
+                AI ANALYSIS RUNNING
             </span>
-            <br>
-            Make sure the backend is running on port 8000.
+            — Processing sonar image...
         `;
 
-    } finally {
 
-        detectButton.disabled = false;
+        analysisStatus.innerText =
+            "Running YOLO detection";
 
+
+        detectionList.innerHTML = `
+            <div
+                style="
+                    text-align:center;
+                    padding:30px;
+                    color:#00e5ff;
+                "
+            >
+                ⟳ AI is analyzing the sonar image...
+            </div>
+        `;
+
+
+        const formData = new FormData();
+
+        formData.append(
+            "file",
+            selectedFile
+        );
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API_URL}/api/detect`,
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                let errorMessage =
+                    "API request failed.";
+
+                try {
+
+                    const errorData =
+                        await response.json();
+
+                    if (errorData.detail) {
+                        errorMessage =
+                            errorData.detail;
+                    }
+
+                } catch (_) {}
+
+                throw new Error(errorMessage);
+            }
+
+
+            const data =
+                await response.json();
+
+
+            apiStatus.innerText =
+                "● Connected";
+
+
+            apiStatus.classList.add(
+                "connected"
+            );
+
+
+            displayResults(data);
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            apiStatus.innerText =
+                "● API Error";
+
+            apiStatus.classList.remove(
+                "connected"
+            );
+
+
+            targetCount.innerText =
+                "ANALYSIS FAILED";
+
+            analysisStatus.innerText =
+                "Could not connect to AI backend";
+
+
+            detectionList.innerHTML = `
+                <div
+                    style="
+                        text-align:center;
+                        padding:30px;
+                        color:#ff7182;
+                    "
+                >
+                    ${escapeHtml(error.message)}
+                </div>
+            `;
+
+
+            result.innerHTML = `
+                <span
+                    class="status"
+                    style="color:#ff4057;"
+                >
+                    CONNECTION ERROR
+                </span>
+                <br>
+                Make sure FastAPI is running on port 8000.
+            `;
+
+        } finally {
+
+            detectButton.disabled = false;
+
+            detectButton.innerText =
+                "⚡ RUN AI DETECTION";
+        }
     }
-});
+);
+
+
+/* =========================
+   HEALTH CHECK
+========================= */
+
+async function checkAPI() {
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_URL}/api/health`
+            );
+
+
+        if (!response.ok) {
+            throw new Error();
+        }
+
+
+        const data =
+            await response.json();
+
+
+        apiStatus.innerText =
+            data.model_loaded
+                ? "● Connected"
+                : "● API Online";
+
+
+        apiStatus.classList.add(
+            "connected"
+        );
+
+
+        if (data.model_loaded) {
+
+            document.getElementById(
+                "modelName"
+            ).innerText =
+                "groupval_onlineaug_1024";
+        }
+
+
+    } catch (error) {
+
+        apiStatus.innerText =
+            "● Offline";
+
+        apiStatus.classList.remove(
+            "connected"
+        );
+    }
+}
+
+
+/* =========================
+   HTML ESCAPE
+========================= */
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+
+/* START */
+
+checkAPI();
+
 </script>
 
 </body>

@@ -1,23 +1,21 @@
-.DS_Store
+.ml-venv/
+venv/
 __pycache__/
 *.pyc
-.venv/
-venv/
-env/
+.env
+.vscode/
 
-# YOLO / training outputs
 runs/
-yolo11n.pt
-*.pt
-*.onnx
+FINAL_RESULTS/
 
-# Large datasets
-train/
-test/
-yolo_dataset/
-yolo_dataset_corrected/
-yolo_train/
+yolo_dataset_groupval/
+yolo_dataset_groupval_aug/
+yolo_dataset_groupval_tiles/
+yolo_dataset_groupval_tiles_balanced/
+yolo_dataset_groupval_tiles_full/
+yolo_dataset_groupval_tiles_hardneg/
+yolo_dataset_groupval_tiles_positive/
 
-# Temporary files
-/tmp/
-*.log
+gt_check/
+large_box_review.jpg
+train_label_check.jpg
