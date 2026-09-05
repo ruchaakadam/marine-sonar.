@@ -609,6 +609,160 @@
             font-size: 11px;
             font-weight: bold;
         }
+        /* =========================================================
+   MULTI-SCAN TARGET TRACKING
+========================================================= */
+
+.tracking-card {
+    margin-top: 20px;
+    padding: 17px;
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0, 229, 255, 0.08),
+            rgba(124, 58, 237, 0.04)
+        );
+
+    border: 1px solid rgba(0, 229, 255, 0.25);
+
+    box-shadow:
+        0 0 20px rgba(0, 229, 255, 0.05);
+}
+
+.tracking-header {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    color: var(--cyan);
+    font-size: 13px;
+    letter-spacing: .5px;
+    margin-bottom: 14px;
+}
+
+.tracking-status {
+    padding: 10px 12px;
+    margin-bottom: 12px;
+
+    background: rgba(3, 20, 34, 0.75);
+    border: 1px solid rgba(0, 229, 255, 0.12);
+    border-radius: 8px;
+
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.tracking-status strong {
+    color: var(--text);
+}
+
+.tracking-button {
+    width: 100%;
+    padding: 11px;
+
+    border: 1px solid rgba(0, 229, 255, 0.35);
+    border-radius: 8px;
+
+    background: rgba(0, 229, 255, 0.08);
+    color: var(--cyan);
+
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .5px;
+
+    cursor: pointer;
+    transition: .25s;
+}
+
+.tracking-button:hover:not(:disabled) {
+    background: rgba(0, 229, 255, 0.15);
+
+    box-shadow:
+        0 0 20px rgba(0, 229, 255, 0.12);
+}
+
+.tracking-button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+}
+
+.tracking-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+
+    margin-top: 12px;
+}
+
+.tracking-stat {
+    padding: 9px 5px;
+
+    text-align: center;
+
+    background: rgba(8, 31, 48, 0.8);
+    border: 1px solid rgba(0, 229, 255, 0.12);
+    border-radius: 8px;
+}
+
+.tracking-stat-value {
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.tracking-stat-label {
+    margin-top: 4px;
+
+    color: var(--muted);
+    font-size: 9px;
+    text-transform: uppercase;
+}
+
+.persistent-value {
+    color: var(--green);
+}
+
+.new-value {
+    color: var(--cyan);
+}
+
+.lost-value {
+    color: #ffd166;
+}
+
+.tracking-results {
+    margin-top: 12px;
+}
+
+.tracking-result {
+    padding: 9px 10px;
+    margin-bottom: 6px;
+
+    background: rgba(255,255,255,0.025);
+    border-radius: 7px;
+
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+.tracking-result strong {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 11px;
+}
+
+.tracking-result small {
+    color: var(--muted);
+}
+
+.tracking-note {
+    margin-top: 10px;
+
+    color: var(--muted);
+    font-size: 9px;
+    line-height: 1.4;
+}
 
         /* MODEL INFO */
 
@@ -833,6 +987,118 @@
             text-align: right;
             max-width: 60%;
         }
+        /* =========================================================
+   FINAL UI POLISH
+========================================================= */
+
+/* Cleaner overall cards */
+.detection-results,
+.navigation-card,
+.tracking-card,
+.model-info {
+    transition: transform 0.2s ease, border-color 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+/* Subtle professional hover effect */
+.detection-results:hover,
+.navigation-card:hover,
+.tracking-card:hover,
+.model-info:hover {
+    border-color: rgba(0, 220, 255, 0.35);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+}
+
+/* Stronger section headings */
+.tracking-header strong,
+.model-info h3,
+.detection-results h2 {
+    letter-spacing: 0.5px;
+}
+
+/* Tracking status */
+.tracking-status {
+    background: rgba(0, 190, 255, 0.045);
+    border: 1px solid rgba(0, 190, 255, 0.16);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 12px 0;
+}
+
+.tracking-status strong {
+    color: #ffffff;
+}
+
+/* Tracking numbers */
+.tracking-stat {
+    min-height: 68px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 9px;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.tracking-stat:hover {
+    transform: translateY(-2px);
+    background: rgba(0, 190, 255, 0.05);
+}
+
+.tracking-stat-value {
+    font-size: 21px;
+    font-weight: 800;
+}
+
+/* Compare button */
+.tracking-button {
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    transition: all 0.2s ease;
+}
+
+.tracking-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+/* Main AI button */
+#detectButton {
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+#detectButton:hover:not(:disabled) {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+}
+
+/* Result status text */
+.tracking-result {
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.tracking-result:hover {
+    background: rgba(0, 190, 255, 0.04);
+}
+
+/* Better small-screen behaviour */
+@media (max-width: 850px) {
+
+    .tracking-summary {
+        gap: 8px;
+    }
+
+    .tracking-stat {
+        min-height: 62px;
+    }
+
+    .tracking-stat-value {
+        font-size: 18px;
+    }
+
+}
     </style>
 </head>
 
@@ -1112,13 +1378,123 @@
     </div>
 
     <div class="intelligence-row">
+        <span>🎯 POSSIBLE IMPACT OBJECT</span>
+        <strong id="possibleImpactObject">—</strong>
+    </div>
+
+    <div class="intelligence-row">
+        <span>📊 DETECTION CONFIDENCE</span>
+        <strong id="impactConfidence">—</strong>
+    </div>
+
+    <div class="intelligence-row">
+        <span>⚠️ IMPACT ASSESSMENT</span>
+        <strong id="impactAssessment">Waiting for analysis</strong>
+    </div>
+
+    <div class="intelligence-row">
         <span>🧠 AI ASSESSMENT</span>
         <strong id="aiAssessment">Waiting for analysis</strong>
+    </div>
+
+    <div class="intelligence-row">
+        <span>🔎 EVIDENCE</span>
+        <strong id="impactEvidence">Waiting for analysis</strong>
     </div>
 
 </div>
 
             </div>
+            <!-- =====================================================
+     MULTI-SCAN TARGET TRACKING
+===================================================== -->
+
+<div class="tracking-card" id="trackingCard">
+
+    <div class="tracking-header">
+        <span>🔄</span>
+        <strong>MULTI-SCAN TARGET TRACKING</strong>
+    </div>
+
+    <div class="tracking-status" id="trackingStatus">
+        Scan 1:
+        <strong>Waiting for analysis</strong>
+    </div>
+
+    <button
+        class="tracking-button"
+        id="compareScansButton"
+        disabled
+    >
+        🔍 COMPARE WITH NEXT SCAN
+    </button>
+
+    <div class="tracking-summary">
+
+        <div class="tracking-stat">
+            <div
+                class="tracking-stat-value persistent-value"
+                id="persistentCount"
+            >
+                0
+            </div>
+
+            <div class="tracking-stat-label">
+                Persistent
+            </div>
+        </div>
+
+        <div class="tracking-stat">
+            <div
+                class="tracking-stat-value new-value"
+                id="newTargetCount"
+            >
+                0
+            </div>
+
+            <div class="tracking-stat-label">
+                New
+            </div>
+        </div>
+
+        <div class="tracking-stat">
+            <div
+                class="tracking-stat-value lost-value"
+                id="lostTargetCount"
+            >
+                0
+            </div>
+
+            <div class="tracking-stat-label">
+                Lost
+            </div>
+        </div>
+
+    </div>
+
+    <div
+        class="tracking-results"
+        id="trackingResults"
+    >
+        <div
+            style="
+                text-align:center;
+                padding:10px;
+                color:#557487;
+                font-size:10px;
+            "
+        >
+            Analyze two sonar scans to compare targets.
+        </div>
+    </div>
+
+    <div class="tracking-note">
+        Target persistence is determined using bounding-box overlap
+        between consecutive sonar scans. It does not independently
+        confirm physical vessel impact.
+    </div>
+
+</div>
 
             <div class="model-info">
 
@@ -1131,13 +1507,13 @@
                     <div class="info-row">
                         <span>Model</span>
                         <span id="modelName">
-                            Marine Sonar YOLO
+                            DRISHTI + Marine Sonar
                         </span>
                     </div>
 
                     <div class="info-row">
                         <span>Framework</span>
-                        <span>YOLOv8</span>
+                        <span>YOLO + FastAPI</span>
                     </div>
 
                     <div class="info-row">
@@ -1156,8 +1532,8 @@
                     </div>
 
                     <div class="info-row">
-                        <span>Detection Class</span>
-                        <span>Target</span>
+                        <span>Detection Classes</span>
+                        <span>Sonar Targets</span>
                     </div>
 
                 </div>
@@ -1213,11 +1589,53 @@ const targetPosition =
 const aiAssessment =
     document.getElementById("aiAssessment");
 
+const possibleImpactObject =
+    document.getElementById("possibleImpactObject");
+
+const impactConfidence =
+    document.getElementById("impactConfidence");
+
+const impactAssessment =
+    document.getElementById("impactAssessment");
+
+const impactEvidence =
+    document.getElementById("impactEvidence");
+
 const apiStatus =
     document.getElementById("apiStatus");
 
 let selectedFile = null;
 let currentObjectURL = null;
+
+// =========================================================
+// MULTI-SCAN TRACKING STATE
+// =========================================================
+
+let previousScanDetections = null;
+let previousScanNumber = 0;
+let currentScanNumber = 0;
+
+// =========================================================
+// MULTI-SCAN TRACKING UI REFERENCES
+// =========================================================
+
+const trackingStatus =
+    document.getElementById("trackingStatus");
+
+const compareScansButton =
+    document.getElementById("compareScansButton");
+
+const persistentCount =
+    document.getElementById("persistentCount");
+
+const newTargetCount =
+    document.getElementById("newTargetCount");
+
+const lostTargetCount =
+    document.getElementById("lostTargetCount");
+
+const trackingResults =
+    document.getElementById("trackingResults");
 
 
 /* =========================================================
@@ -1233,7 +1651,7 @@ imageInput.addEventListener("change", function(event) {
     if (!file) {
         return;
     }
-
+    selectedFile = file;
     handleFile(file);
 });
 
@@ -1313,8 +1731,8 @@ function handleFile(file) {
 
         return;
     }
-
-    selectedFile = file;
+selectedFile = file;
+    
 
 
     /* Revoke old object URL */
@@ -1381,6 +1799,18 @@ function handleFile(file) {
         "—";
 
     aiAssessment.innerText =
+        "Waiting for analysis";
+
+    possibleImpactObject.innerText =
+        "—";
+
+    impactConfidence.innerText =
+        "—";
+
+    impactAssessment.innerText =
+        "Waiting for analysis";
+
+    impactEvidence.innerText =
         "Waiting for analysis";
 
 
@@ -2039,78 +2469,214 @@ function getTargetPosition(detection) {
 /* =========================================================
    UPDATE NAVIGATION RECOMMENDATION
 ========================================================= */
-
 function updateNavigationRecommendation(
-    detections
+    detections,
+    targetAnalysis
 ) {
 
-    if (
-        !detections ||
-        detections.length === 0
-    ) {
+    /* The first detection is the highest-confidence detection. */
+    const primaryDetection =
+        Array.isArray(detections) && detections.length > 0
+            ? detections[0]
+            : null;
+
+    const primaryConfidence =
+        primaryDetection
+            ? Number(primaryDetection.confidence || 0)
+            : 0;
+
+    const primaryClass =
+        primaryDetection
+            ? (
+                primaryDetection.class_name ||
+                primaryDetection.class ||
+                "target"
+            )
+            : null;
+
+    const primaryClassLabel =
+        primaryClass
+            ? String(primaryClass)
+                .replaceAll("_", " ")
+                .replace(/\b\w/g, function(letter) {
+                    return letter.toUpperCase();
+                })
+            : "Potential target";
+
+
+    /* =====================================================
+       NO DETECTION
+    ===================================================== */
+
+    if (!primaryDetection) {
 
         riskLevel.innerText =
-            "NO TARGET";
-
+            targetAnalysis && targetAnalysis.status
+                ? targetAnalysis.status
+                : "NO TARGET";
 
         recommendedAction.innerText =
-            "MAINTAIN COURSE & CONTINUE MONITORING";
-
+            targetAnalysis && targetAnalysis.recommended_action
+                ? targetAnalysis.recommended_action
+                : "MAINTAIN COURSE & CONTINUE MONITORING";
 
         targetPosition.innerText =
             "No target detected";
 
+        possibleImpactObject.innerText =
+            "None identified";
+
+        impactConfidence.innerText =
+            "—";
+
+        impactAssessment.innerText =
+            "NO POTENTIAL IMPACT OBJECT IDENTIFIED";
 
         aiAssessment.innerText =
-            "No potential underwater target identified.";
+            targetAnalysis && targetAnalysis.assessment
+                ? targetAnalysis.assessment
+                : "No potential underwater target identified.";
 
+        if (
+            targetAnalysis &&
+            Array.isArray(targetAnalysis.evidence) &&
+            targetAnalysis.evidence.length > 0
+        ) {
+            impactEvidence.innerHTML =
+                targetAnalysis.evidence
+                    .map(function(item) {
+                        return `✓ ${escapeHtml(item)}`;
+                    })
+                    .join("<br>");
+        } else {
+            impactEvidence.innerText =
+                "No sonar target detected.";
+        }
 
         return;
     }
 
 
-    const highestConfidenceDetection =
-        [...detections].sort(
-            function(a, b) {
-
-                return (
-                    Number(
-                        b.confidence || 0
-                    ) -
-                    Number(
-                        a.confidence || 0
-                    )
-                );
-            }
-        )[0];
-
+    /* =====================================================
+       RISK
+    ===================================================== */
 
     const risk =
-        calculateRisk(
-            highestConfidenceDetection
-        );
-
+        calculateRisk(primaryDetection);
 
     riskLevel.innerText =
-        risk.level;
-
+        targetAnalysis && targetAnalysis.status
+            ? targetAnalysis.status
+            : risk.level;
 
     recommendedAction.innerText =
-        risk.action;
+        targetAnalysis && targetAnalysis.recommended_action
+            ? targetAnalysis.recommended_action
+            : risk.action;
 
+
+    /* =====================================================
+       TARGET POSITION
+    ===================================================== */
 
     const location =
-        getTargetPosition(
-            highestConfidenceDetection
-        );
-
+        getTargetPosition(primaryDetection);
 
     targetPosition.innerText =
-        location.position;
+        `Potential ${primaryClassLabel} detected`;
 
+
+    /* =====================================================
+       POSSIBLE IMPACT OBJECT
+       Use backend value when available.
+       Otherwise use the actual detected class.
+    ===================================================== */
+
+    const backendImpactObject =
+        targetAnalysis &&
+        targetAnalysis.possible_impact_object
+            ? String(
+                targetAnalysis.possible_impact_object
+            ).trim()
+            : "";
+
+    possibleImpactObject.innerText =
+        backendImpactObject ||
+        `Potential ${primaryClassLabel}`;
+
+
+    /* =====================================================
+       CONFIDENCE
+       Always show the primary detection confidence if the
+       backend does not provide a separate analysis confidence.
+    ===================================================== */
+
+    const backendConfidence =
+        targetAnalysis &&
+        targetAnalysis.confidence !== undefined &&
+        targetAnalysis.confidence !== null &&
+        Number.isFinite(
+            Number(targetAnalysis.confidence)
+        )
+            ? Number(targetAnalysis.confidence)
+            : null;
+
+    const finalConfidence =
+        backendConfidence !== null
+            ? backendConfidence
+            : primaryConfidence;
+
+    impactConfidence.innerText =
+        `${Math.round(finalConfidence * 100)}%`;
+
+
+    /* =====================================================
+       IMPACT ASSESSMENT
+    ===================================================== */
+
+    impactAssessment.innerText =
+        targetAnalysis &&
+        targetAnalysis.impact_assessment
+            ? targetAnalysis.impact_assessment
+            : "Potential object detected; impact is not confirmed from sonar alone.";
+
+
+    /* =====================================================
+       AI ASSESSMENT
+    ===================================================== */
 
     aiAssessment.innerText =
-        location.assessment;
+        targetAnalysis &&
+        targetAnalysis.assessment
+            ? targetAnalysis.assessment
+            : `${primaryClassLabel} identified by the sonar AI model with ${Math.round(primaryConfidence * 100)}% confidence.`;
+
+
+    /* =====================================================
+       EVIDENCE
+    ===================================================== */
+
+    if (
+        targetAnalysis &&
+        Array.isArray(targetAnalysis.evidence) &&
+        targetAnalysis.evidence.length > 0
+    ) {
+
+        impactEvidence.innerHTML =
+            targetAnalysis.evidence
+                .map(function(item) {
+                    return `✓ ${escapeHtml(item)}`;
+                })
+                .join("<br>");
+
+    } else {
+
+        impactEvidence.innerHTML =
+            `✓ ${escapeHtml(primaryClassLabel)} detected by sonar AI<br>` +
+            `✓ Primary detection confidence: ${Math.round(primaryConfidence * 100)}%<br>` +
+            `✓ Target position estimated from bounding box<br>` +
+            `✓ Sonar evidence alone does not confirm physical impact`;
+    }
 }
 
 
@@ -2120,14 +2686,19 @@ function updateNavigationRecommendation(
 
 function displayResults(data) {
 
-    const detections =
-        Array.isArray(
-            data &&
-            data.detections
-        )
-            ? data.detections
-            : [];
+const detections =
 
+    Array.isArray(
+
+        data &&
+        data.detections
+
+    )
+
+        ? data.detections
+        : [];
+
+window.latestDetections = detections;
 
     const count =
         detections.length;
@@ -2249,10 +2820,38 @@ function displayResults(data) {
     ===================================================== */
 
     updateNavigationRecommendation(
-        sortedDetections
-    );
+    sortedDetections,
+    data && data.target_analysis
+);
+// =========================================================
+// SAVE DETECTION FOR MULTI-SCAN TRACKING
+// =========================================================
 
+if (previousScanDetections === null) {
 
+    // First analyzed scan becomes Scan 1
+    previousScanDetections = sortedDetections;
+    previousScanNumber = 1;
+
+    trackingStatus.innerHTML =
+        `Scan 1: <strong>${sortedDetections.length} target(s) detected</strong>`;
+
+    compareScansButton.disabled = false;
+
+    compareScansButton.innerText =
+        "🔍 COMPARE WITH NEXT SCAN";
+
+} else {
+
+    // New analysis becomes Scan 2
+    currentScanNumber = previousScanNumber + 1;
+
+    trackingStatus.innerHTML =
+        `Scan ${currentScanNumber}: <strong>${sortedDetections.length} target(s) detected</strong>`;
+
+    compareScansButton.disabled = false;
+
+}
     /* =====================================================
        NO DETECTIONS
     ===================================================== */
@@ -2662,7 +3261,7 @@ async function checkAPI() {
             if (modelName) {
 
                 modelName.innerText =
-                    "groupval_onlineaug_1024";
+                    "DRISHTI + Marine Sonar";
             }
         }
 
@@ -2726,7 +3325,236 @@ function escapeHtml(value) {
 
 checkAPI();
 
+
+// =========================================================
+// DISPLAY TRACKING RESULTS
+// =========================================================
+
+function displayTrackingResults(data) {
+
+    persistentCount.innerText =
+        data.persistent_targets || 0;
+
+    newTargetCount.innerText =
+        data.new_targets || 0;
+
+    lostTargetCount.innerText =
+        data.no_longer_detected || 0;
+
+
+    if (!data.matches || data.matches.length === 0) {
+
+        trackingResults.innerHTML = `
+            <div class="tracking-result">
+
+                <strong>NO TARGET CHANGES</strong>
+
+                <small>
+                    No target transitions were identified
+                    between the two scans.
+                </small>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    trackingResults.innerHTML =
+        data.matches.map(function(match) {
+
+            let icon = "🔎";
+
+            if (match.status === "PERSISTENT TARGET") {
+                icon = "🟢";
+            }
+
+            if (match.status === "NEW TARGET") {
+                icon = "🆕";
+            }
+
+            if (match.status === "NO LONGER DETECTED") {
+                icon = "⚪";
+            }
+
+
+            const confidence =
+                Math.round(
+                    Number(match.confidence || 0) * 100
+                );
+
+            const iou =
+                Number(match.iou || 0).toFixed(2);
+
+
+            return `
+                <div class="tracking-result">
+
+                    <strong>
+                        ${icon}
+                        ${escapeHtml(match.status)}
+                    </strong>
+
+                    <small>
+                        Confidence: ${confidence}%
+                        ${
+                            match.status === "PERSISTENT TARGET"
+                                ? ` • IoU: ${iou}`
+                                : ""
+                        }
+                    </small>
+
+                </div>
+            `;
+
+        }).join("");
+}
+
+
+
+// =========================================================
+// COMPARE TWO SONAR SCANS
+// =========================================================
+
+compareScansButton.addEventListener(
+    "click",
+    async function() {
+
+        if (
+            previousScanDetections === null ||
+            !Array.isArray(previousScanDetections)
+        ) {
+
+            trackingResults.innerHTML = `
+                <div class="tracking-result">
+
+                    <strong>⚠️ NO PREVIOUS SCAN</strong>
+
+                    <small>
+                        Analyze a sonar image before comparing scans.
+                    </small>
+
+                </div>
+            `;
+
+            return;
+        }
+
+
+        if (
+            typeof window.latestDetections === "undefined" ||
+            !Array.isArray(window.latestDetections)
+        ) {
+
+            trackingResults.innerHTML = `
+                <div class="tracking-result">
+
+                    <strong>⚠️ CURRENT SCAN NOT AVAILABLE</strong>
+
+                    <small>
+                        Run AI detection on the next sonar image.
+                    </small>
+
+                </div>
+            `;
+
+            return;
+        }
+
+
+        const currentDetections =
+            window.latestDetections;
+
+
+        compareScansButton.disabled = true;
+
+        compareScansButton.innerText =
+            "⏳ COMPARING SCANS...";
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API_URL}/api/track`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            previous_detections:
+                                previousScanDetections,
+
+                            current_detections:
+                                currentDetections
+
+                        })
+                    }
+                );
+
+
+            const trackingData =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    trackingData.detail ||
+                    "Tracking request failed."
+                );
+
+            }
+
+
+            displayTrackingResults(
+                trackingData
+            );
+
+
+            previousScanDetections =
+                currentDetections;
+
+            previousScanNumber =
+                currentScanNumber;
+
+
+        } catch (error) {
+
+            trackingResults.innerHTML = `
+                <div class="tracking-result">
+
+                    <strong>
+                        ⚠️ TRACKING ERROR
+                    </strong>
+
+                    <small>
+                        ${escapeHtml(error.message)}
+                    </small>
+
+                </div>
+            `;
+
+        } finally {
+
+            compareScansButton.disabled =
+                false;
+
+            compareScansButton.innerText =
+                "🔍 COMPARE WITH NEXT SCAN";
+
+        }
+
+    }
+);
+
 </script>
+
 
 </body>
 </html>
